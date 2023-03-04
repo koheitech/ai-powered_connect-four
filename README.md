@@ -8,7 +8,7 @@
 
 ## Tech Stack
 - game of selection: "Connect Four"
-- language: python (version?)
+- language: python 3.11
 
 ## Development report and schedule
 - [development report](https://docs.google.com/document/d/1xprl8EfH10pOWCRVt4Mu5pmD7XEUdM5003rXjD1ZCd8/edit?usp=sharing)
