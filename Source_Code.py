@@ -21,11 +21,11 @@ def check_winner(GSM, depth, move):
     else:
         player = 1
     for y in range(5, depth-1, -1):
-        for x in range(7-3):
+        for x in range(5):
             try:
                 if GSM[y][x] == player and GSM[y][x+1] == player and GSM[y][x+2] == player and GSM[y][x+3] == player:
                     announce_winner(player)
-                if depth < 2:
+                if depth < 3:
                     if GSM[y][x] == player and GSM[y+1][x] == player and GSM[y+2][x] == player and GSM[y+3][x] == player:
                         announce_winner(player)
                     if GSM[y][x] == player and GSM[y+1][x-1] == player and GSM[y+2][x-2] == player and GSM[y+3][x-3] == player:
@@ -100,7 +100,7 @@ def startgame():
     app = QApplication(sys.argv)
     w = QWidget()
     w.resize(1000, 1000)
-    w.setWindowTitle("Connect-4")
+    w.setWindowTitle("Guru99")
 
     for y in range(5, -1, -1):
         for x in range(7):
