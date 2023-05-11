@@ -36,14 +36,21 @@ def check_winner(GSM, depth, move):
                 break
 
 
-def player_2(GSM, y, x, depth, occupiedCOL, move):
+def make_move(GSM, y, x, depth, occupiedCOL, move):
+
     move += 1
-    GAME_BOARD[y][x].setStyleSheet(
-        "QPushButton""{""background-color : red;border-radius : 50;border : 2px solid black""}")
+    red = "QPushButton""{""background-color : red;border-radius : 50;border : 2px solid black""}"
+    blue = "QPushButton""{""background-color : blue;border-radius : 50;border : 2px solid black""}"
+    if move % 2 == 0:
+        colour = red
+        GSM[y][x] = 2
+    else:
+        colour = blue
+        GSM[y][x] = 1
+    GAME_BOARD[y][x].setStyleSheet(colour)
     GAME_BOARD[y][x].setEnabled(False)
     if x not in occupiedCOL:
         occupiedCOL.append(x)
-    GSM[y][x] = 2
     if y < depth:
         depth = y
     check_winner(GSM, depth, move)
@@ -55,43 +62,14 @@ def player_2(GSM, y, x, depth, occupiedCOL, move):
                     "QPushButton""{""background-color : white;border-radius : 50;border : 2px solid black""}")
                 GAME_BOARD[y][x].setEnabled(True)
                 GAME_BOARD[y][x].clicked.connect(
-                    partial(player_1, GSM, y, x, depth, [], move))
+                    partial(make_move, GSM, y, x, depth, [], move))
             if GSM[y][x] > 0 and y > 0 and GSM[y-1][x] != 1 and GSM[y-1][x] != 2:
                 # GSM[y-1][x]=-1
                 GAME_BOARD[y-1][x].setStyleSheet(
                     "QPushButton""{""background-color : white;border-radius : 50;border : 2px solid black""}")
                 GAME_BOARD[y-1][x].setEnabled(True)
                 GAME_BOARD[y-1][x].clicked.connect(
-                    partial(player_1, GSM, y-1, x, depth+1, [], move))
-
-
-def player_1(GSM, y, x, depth, occupiedCOL, move):
-    move += 1
-    GAME_BOARD[y][x].setStyleSheet(
-        "QPushButton""{""background-color : blue;border-radius : 50;border : 2px solid black""}")
-    GAME_BOARD[y][x].setEnabled(False)
-    if x not in occupiedCOL:
-        occupiedCOL.append(x)
-    GSM[y][x] = 1
-    if y < depth:
-        depth = y
-    check_winner(GSM, depth, move)
-    for y in range(5, depth-1, -1):
-        for x in range(7):
-            if y == 5 and GSM[y][x] < 1 and (x not in occupiedCOL):
-                # GSM[y][x]=-1
-                GAME_BOARD[y][x].setStyleSheet(
-                    "QPushButton""{""background-color : white;border-radius : 50;border : 2px solid black""}")
-                GAME_BOARD[y][x].setEnabled(True)
-                GAME_BOARD[y][x].clicked.connect(
-                    partial(player_2, GSM, y, x, depth, [], move))
-            if GSM[y][x] > 0 and y > 0 and GSM[y-1][x] != 1 and GSM[y-1][x] != 2:
-                # GSM[y-1][x]=-1
-                GAME_BOARD[y-1][x].setStyleSheet(
-                    "QPushButton""{""background-color : white;border-radius : 50;border : 2px solid black""}")
-                GAME_BOARD[y-1][x].setEnabled(True)
-                GAME_BOARD[y-1][x].clicked.connect(
-                    partial(player_2, GSM, y-1, x, depth+1, [], move))
+                    partial(make_move, GSM, y-1, x, depth+1, [], move))
 
 
 def startgame():
@@ -100,7 +78,7 @@ def startgame():
     app = QApplication(sys.argv)
     w = QWidget()
     w.resize(1000, 1000)
-    w.setWindowTitle("Connect-4")
+    w.setWindowTitle("Guru99")
 
     for y in range(5, -1, -1):
         for x in range(7):
@@ -115,7 +93,7 @@ def startgame():
             if y == 5:
                 GAME_BOARD[y][x].setEnabled(True)
                 GAME_BOARD[y][x].clicked.connect(
-                    partial(player_1, GSM, y, x, depth, [], move_no))
+                    partial(make_move, GSM, y, x, depth, [], move_no))
     w.show()
     sys.exit(app.exec_())
 
