@@ -277,12 +277,3 @@ class Tree:
                             promise_col = col
 
         return (promise_row, promise_col)
-
-
-class main_body():
-    def call_tree(self, board, player, depth_limit):
-        tree = Tree(board, player, depth_limit)
-        tree.generate_game_tree()
-        row, col = tree.make_best_move(tree.root)
-
-        return row, col
