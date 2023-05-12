@@ -1,8 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QMessageBox
 from functools import partial
-import AI
-import player2player as P2P
 
 
 def announce_winner(player):
@@ -38,25 +36,24 @@ def check_winner(GSM, depth, move):
                 break
 
 
-def make_move(GSM, y, x, depth, occupiedCOL):
-    global move_no
-    move_no += 1
+def make_move(GSM, y, x, depth, occupiedCOL, move):
+
+    move += 1
     red = "QPushButton""{""background-color : red;border-radius : 50;border : 2px solid black""}"
     blue = "QPushButton""{""background-color : blue;border-radius : 50;border : 2px solid black""}"
-    if move_no % 2 == 0:
+    if move % 2 == 0:
         colour = red
         GSM[y][x] = 2
     else:
         colour = blue
         GSM[y][x] = 1
-
     GAME_BOARD[y][x].setStyleSheet(colour)
     GAME_BOARD[y][x].setEnabled(False)
     if x not in occupiedCOL:
         occupiedCOL.append(x)
     if y < depth:
         depth = y
-    check_winner(GSM, depth, move_no)
+    check_winner(GSM, depth, move)
     for y in range(5, depth-1, -1):
         for x in range(7):
             if y == 5 and GSM[y][x] < 1 and (x not in occupiedCOL):
@@ -64,29 +61,24 @@ def make_move(GSM, y, x, depth, occupiedCOL):
                 GAME_BOARD[y][x].setStyleSheet(
                     "QPushButton""{""background-color : white;border-radius : 50;border : 2px solid black""}")
                 GAME_BOARD[y][x].setEnabled(True)
-#                 GAME_BOARD[y][x].clicked.connect(partial(make_move,GSM,y,x,depth,[],move))
+                GAME_BOARD[y][x].clicked.connect(
+                    partial(make_move, GSM, y, x, depth, [], move))
             if GSM[y][x] > 0 and y > 0 and GSM[y-1][x] != 1 and GSM[y-1][x] != 2:
                 # GSM[y-1][x]=-1
                 GAME_BOARD[y-1][x].setStyleSheet(
                     "QPushButton""{""background-color : white;border-radius : 50;border : 2px solid black""}")
                 GAME_BOARD[y-1][x].setEnabled(True)
-#                 GAME_BOARD[y-1][x].clicked.connect(partial(make_move,GSM,y-1,x,depth+1,[],move))
-
-    if move_no % 2 != 0:
-        tree = AI.Tree(GSM, False, 5)
-        tree.generate_game_tree()
-        y, x = tree.make_best_move(tree.root)
-        make_move(GSM, y, x, depth, [])
-    else:
-        return
+                GAME_BOARD[y-1][x].clicked.connect(
+                    partial(make_move, GSM, y-1, x, depth+1, [], move))
 
 
 def startgame():
+    move_no = 0
     depth = 5
     app = QApplication(sys.argv)
     w = QWidget()
     w.resize(1000, 1000)
-    w.setWindowTitle("connect_4")
+    w.setWindowTitle("Guru99")
 
     for y in range(5, -1, -1):
         for x in range(7):
@@ -97,46 +89,30 @@ def startgame():
             # "border-radius : 50;border : 2px solid black;"
             GAME_BOARD[y][x].move((40+75)*x, (40+75)*y)
             GAME_BOARD[y][x].setEnabled(False)
-            GAME_BOARD[y][x].clicked.connect(
-                partial(make_move, GSM, y, x, depth, []))
             GAME_BOARD[y][x].show()
             if y == 5:
                 GAME_BOARD[y][x].setEnabled(True)
-
+                GAME_BOARD[y][x].clicked.connect(
+                    partial(make_move, GSM, y, x, depth, [], move_no))
     w.show()
     sys.exit(app.exec_())
 
 
-def gameinit():
-    while True:
-        user_input = input(
-            "Would you like to play with AI or your friend? (1: AI, 2: Player-to-Player)")
-        if user_input == "1":
-            P2P.startgame()
-        elif user_input == "2":
-            startgame()
-        else:
-            print("Invalid input. Please enter 1 or 2.")
-
-
-if __name__ == "__main__":
-    GAME_BOARD = [
-        ["a0", "b0", "c0", "d0", "e0", "f0", "g0"],
-        ["a1", "b1", "c1", "d1", "e1", "f1", "g1"],
-        ["a2", "b2", "c2", "d2", "e2", "f2", "g2"],
-        ["a3", "b3", "c3", "d3", "e3", "f3", "g3"],
-        ["a4", "b4", "c4", "d4", "e4", "f4", "g4"],
-        ["a5", "b5", "c5", "d5", "e5", "f5", "g5"]
-    ]
-    # Game State Matrix
-    GSM = [
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0]
-    ]
-    move_no = 0
-
-    gameinit()
+GAME_BOARD = [
+    ["a0", "b0", "c0", "d0", "e0", "f0", "g0"],
+    ["a1", "b1", "c1", "d1", "e1", "f1", "g1"],
+    ["a2", "b2", "c2", "d2", "e2", "f2", "g2"],
+    ["a3", "b3", "c3", "d3", "e3", "f3", "g3"],
+    ["a4", "b4", "c4", "d4", "e4", "f4", "g4"],
+    ["a5", "b5", "c5", "d5", "e5", "f5", "g5"]
+]
+# Game State Matrix
+GSM = [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0]
+]
+# startgame()
