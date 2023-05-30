@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QMessageBox
 from functools import partial
 import AI
+import player2player as P2P
 
 
 def announce_winner(player):
@@ -9,32 +10,46 @@ def announce_winner(player):
     msg.setIcon(QMessageBox.Information)
     msg.setText("Player"+str(player)+"Wins")
     msg.setWindowTitle("Game Over")
-    msg.buttonClicked.connect(startgame)
+    msg.buttonClicked.connect(sys.exit)
     msg.exec_()
     msg.show()
 
 
-def check_winner(GSM, depth, move):
-    if move < 7:
-        return 0
+def check_winner(GSM, move):
+
     if move % 2 == 0:
-        player = 2
+        chip = 2
     else:
-        player = 1
-    for y in range(5, depth-1, -1):
-        for x in range(5):
-            try:
-                if GSM[y][x] == player and GSM[y][x+1] == player and GSM[y][x+2] == player and GSM[y][x+3] == player:
-                    announce_winner(player)
-                if depth < 3:
-                    if GSM[y][x] == player and GSM[y+1][x] == player and GSM[y+2][x] == player and GSM[y+3][x] == player:
-                        announce_winner(player)
-                    if GSM[y][x] == player and GSM[y+1][x-1] == player and GSM[y+2][x-2] == player and GSM[y+3][x-3] == player:
-                        announce_winner(player)
-                    if GSM[y][x] == player and GSM[y+1][x+1] == player and GSM[y+2][x+2] == player and GSM[y+3][x+3] == player:
-                        announce_winner(player)
-            except IndexError:
-                break
+        chip = 1
+    """
+    Check any 4 seqquenciak chip in horizontal, vertical and diagonal spaces for both of the players.
+    If there is winner, return True. 
+    Otherwise, return False.
+    """
+    # Check horizontal spaces
+    for x in range(ROWS):
+        for y in range(COLS - 3):
+            if GSM[x][y] == chip and GSM[x][y+1] == chip and GSM[x][y+2] == chip and GSM[x][y+3] == chip:
+                announce_winner(chip)
+
+    # Check vertical spaces
+    for y in range(COLS):
+        for x in range(ROWS - 3):
+            if GSM[x][y] == chip and GSM[x+1][y] == chip and GSM[x+2][y] == chip and GSM[x+3][y] == chip:
+                announce_winner(chip)
+
+    # Check upper right to bottom left diagonal spaces
+    for x in range(ROWS - 3):
+        for y in range(3, COLS):
+            if GSM[x][y] == chip and GSM[x+1][y-1] == chip and GSM[x+2][y-2] == chip and GSM[x+3][y-3] == chip:
+                announce_winner(chip)
+
+    # Check upper left to bottom right diagonal spaces
+    for x in range(ROWS - 3):
+        for y in range(COLS - 3):
+            if GSM[x][y] == chip and GSM[x+1][y+1] == chip and GSM[x+2][y+2] == chip and GSM[x+3][y+3] == chip:
+                announce_winner(chip)
+    return False
 
 
 def make_move(GSM, y, x, depth, occupiedCOL):
@@ -55,7 +70,7 @@ def make_move(GSM, y, x, depth, occupiedCOL):
         occupiedCOL.append(x)
     if y < depth:
         depth = y
-    check_winner(GSM, depth, move_no)
+    check_winner(GSM, move_no)
     for y in range(5, depth-1, -1):
         for x in range(7):
             if y == 5 and GSM[y][x] < 1 and (x not in occupiedCOL):
@@ -80,13 +95,12 @@ def make_move(GSM, y, x, depth, occupiedCOL):
         return
 
 
-def startgame():
+def startgame(label, btn1, btn2):
+    if label != None:
+        label.hide()
+        btn1.hide()
+        btn2.hide()
     depth = 5
-    app = QApplication(sys.argv)
-    w = QWidget()
-    w.resize(1000, 1000)
-    w.setWindowTitle("connect_4")
-
     for y in range(5, -1, -1):
         for x in range(7):
             GAME_BOARD[y][x] = QPushButton(w)
@@ -101,9 +115,26 @@ def startgame():
             GAME_BOARD[y][x].show()
             if y == 5:
                 GAME_BOARD[y][x].setEnabled(True)
-
     w.show()
-    sys.exit(app.exec_())
+
+
+def gameinit():
+    w.resize(1000, 1000)
+    w.setWindowTitle("connect_4")
+    Instruction = QLabel("Select Game Mode", w)
+    Instruction.move(40, 0)
+    PvP = QPushButton("Player vs. Player", w)
+    PvP.setFixedWidth(150)
+    PvP.move(25, 50)
+    PvC = QPushButton("Player vs. Computer", w)
+    PvC.setFixedWidth(150)
+    PvC.move(25, 100)
+    PvC.clicked.connect(partial(startgame, Instruction, PvC, PvP))
+    PvP.clicked.connect(partial(P2P.startgame, w, Instruction, PvC, PvP))
+    Instruction.show()
+    PvP.show()
+    PvC.show()
+    w.show()
 
 
 if __name__ == "__main__":
@@ -124,6 +155,13 @@ if __name__ == "__main__":
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0]
     ]
-    move_no = 0
 
-    startgame()
+    ROWS = len(GSM)
+    COLS = len(GSM[0])
+
+    move_no = 0
+    app = QApplication(sys.argv)
+    w = QWidget()
+    w.show
+    gameinit()
+    sys.exit(app.exec_())
