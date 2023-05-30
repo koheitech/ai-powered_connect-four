@@ -110,7 +110,7 @@ def startgame():
 def gameinit():
     while True:
         user_input = input(
-            "Would you like to play with AI or your friend? (1: AI, 2: Player-to-Player)")
+            "Would you like to play with AI or your friend? (1: Player-to-Player, 2: AI)")
         if user_input == "1":
             P2P.startgame()
         elif user_input == "2":
